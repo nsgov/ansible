@@ -1,0 +1,30 @@
+---
+image: quay.io/ansible/molecule
+
+stages:
+  - quick
+  - indepth
+  - deploy
+
+lint:
+  stage: quick
+  script:
+    - molecule lint
+
+syntax:
+  stage: quick
+  script:
+    - molecule syntax
+
+test:
+  stage: indepth
+  script:
+    - molecule test --destroy always
+
+tower:
+  stage: deploy
+  image: rhel7
+  script:
+    - "curl -s -ku ${TOWER_USERNAME}:${TOWER_PASSWORD} -H \"Content-Type: application/json\" -X POST  -d '{}' ${TOWER_PROJECT_URL} > /dev/null"
+  only:
+    - master
